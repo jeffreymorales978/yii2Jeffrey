@@ -21,6 +21,32 @@ class ActorController extends Controller
         return array_merge(
             parent::behaviors(),
             [
+                'access' => [
+                    'class' => \yii\filters\AccessControl::class,
+                    'rules' => [
+                        // Allow everyone to view actor details
+                        [
+                            'allow' => true,
+                            'actions' => ['view'],
+                            'roles' => ['?', '@'],
+                        ],
+                        // Allow only admin to see index and CRUD operations
+                        [
+                            'allow' => true,
+                            'actions' => ['index', 'create', 'update', 'delete'],
+                            'roles' => ['@'],
+                            'matchCallback' => function ($rule, $action) {
+                                return !empty(\Yii::$app->user->identity) && \Yii::$app->user->identity->role === 'admin';
+                            },
+                        ],
+                    ],
+                    'denyCallback' => function ($rule, $action) {
+                        if (\Yii::$app->user->isGuest) {
+                            return \Yii::$app->response->redirect(['/site/login']);
+                        }
+                        throw new \yii\web\ForbiddenHttpException('No tienes permiso para acceder a esta página.');
+                    },
+                ],
                 'verbs' => [
                     'class' => VerbFilter::className(),
                     'actions' => [

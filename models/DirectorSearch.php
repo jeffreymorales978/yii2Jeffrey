@@ -11,16 +11,19 @@ use app\models\Director;
  */
 class DirectorSearch extends Director
 {
+    public $fecha; // Añadimos la propiedad 'fecha' a la clase DirectorSearch
+
     /**
      * {@inheritdoc}
      */
     public function rules()
-    {
-        return [
-            [['iddirector'], 'integer'],
-            [['nombre', 'apellido', 'fecha'], 'safe'],
-        ];
-    }
+{
+    return [
+        [['iddirector'], 'integer'],
+        [['nombre', 'apellido', 'fecha_nacimiento'], 'safe'], // Usamos 'fecha_nacimiento' aquí
+    ];
+}
+
 
     /**
      * {@inheritdoc}
@@ -64,8 +67,25 @@ class DirectorSearch extends Director
 
         $query->andFilterWhere(['like', 'nombre', $this->nombre])
             ->andFilterWhere(['like', 'apellido', $this->apellido])
-            ->andFilterWhere(['like', 'fecha', $this->fecha]);
+            ->andFilterWhere(['like', 'fecha', $this->fecha]); // Asegúrate de que 'fecha' sea accesible
 
         return $dataProvider;
+    }
+
+    /**
+     * Getter para la propiedad 'fecha'.
+     *
+     * @return string
+     */
+    public function getFecha()
+    {
+        // Aquí puedes definir la lógica para obtener el valor de 'fecha'.
+        // Por ejemplo, si 'fecha' es un campo de la base de datos, podrías retornarlo directamente.
+        // Si es un valor calculado, retorna el valor correspondiente.
+
+        // Ejemplo:
+        // return $this->fecha_nacimiento; // Si 'fecha' es una propiedad de 'Director' o un campo de base de datos
+
+        return parent::getFecha(); // Si 'fecha' es un campo de 'Director'
     }
 }

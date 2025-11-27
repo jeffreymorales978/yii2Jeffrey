@@ -36,46 +36,57 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
         'brandUrl' => Yii::$app->homeUrl,
         'options' => ['class' => 'navbar-expand-md navbar-dark bg-dark fixed-top']
     ]);
-    echo Nav::widget([
-        'options' => ['class' => 'navbar-nav'],
-        'items' => [
-            ['label' => 'Inicio', 'url' => ['/site/index']],
-             //['label' => 'Sobre nosotros', 'url' => ['/site/about']],
-            //['label' => 'Contactenos', 'url' => ['/site/contact']],
-                [
-                    'label' => 'Ver peliculas',
-                    'items' => [
+    $navItems = [
+        ['label' => 'Inicio', 'url' => ['/site/index']],
+    ];
+    
+    // Add "Ver peliculas" menu only for admin users
+    if (!Yii::$app->user->isGuest && Yii::$app->user->identity->role === 'admin') {
+        $navItems[] = [
+            'label' => 'Ver peliculas',
+            'items' => [
+                ['label' => 'Peliculas', 'url' => ['/pelicula/index']],
                 ['label' => 'Actores', 'url' => ['/actor/index']],
                 ['label' => 'Directores', 'url' => ['/director/index']],
                 ['label' => 'Generos', 'url' => ['/genero/index']],
-                ['label' => 'Peliculas', 'url' => ['/pelicula/index']],
-                    ],
-                ],
-
-            Yii::$app->user->isGuest
-                ? ['label' => 'Iniciar Sesion', 'url' => ['/site/login']]
-                : '<li class="nav-item">'
-                    . Html::beginForm(['/site/logout'])
-                    . Html::submitButton(
-                        'Cerrar Sesion (' . Yii::$app->user->identity->username . ')',
-                        ['class' => 'nav-link btn btn-link logout']
-                    )
-                    . Html::endForm()
-                    . '</li>'
-        ]
+                ['label' => 'Usuarios', 'url' => ['/user/index']],
+            ],
+        ];
+    }
+    
+    // Add "Cambiar contraseña" only for logged-in users
+    if (!Yii::$app->user->isGuest) {
+        $navItems[] = ['label' => 'Cambiar contraseña', 'url' => ['/user/change-password']];
+    }
+    
+    // Add login/logout
+    $navItems[] = Yii::$app->user->isGuest
+        ? ['label' => 'Iniciar Sesion', 'url' => ['/site/login']]
+        : '<li class="nav-item">'
+            . Html::beginForm(['/site/logout'])
+            . Html::submitButton(
+                'Cerrar Sesion (' . Yii::$app->user->identity->apellido . ' ' . Yii::$app->user->identity->nombre . ') ' . Yii::$app->user->identity->role,
+                ['class' => 'nav-link btn btn-link logout']
+            )
+            . Html::endForm()
+            . '</li>';
+    
+    echo Nav::widget([
+        'options' => ['class' => 'navbar-nav'],
+        'items' => $navItems,
     ]);
     NavBar::end();
     ?>
 </header>
 
 <main id="main" class="flex-shrink-0" role="main">
-    <div class="container">
-        <?php if (!empty($this->params['breadcrumbs'])): ?>
+    <?php if (!empty($this->params['breadcrumbs'])): ?>
+        <div class="container">
             <?= Breadcrumbs::widget(['links' => $this->params['breadcrumbs']]) ?>
-        <?php endif ?>
-        <?= Alert::widget() ?>
-        <?= $content ?>
-    </div>
+        </div>
+    <?php endif ?>
+    <?= Alert::widget() ?>
+    <?= $content ?>
 </main>
 
 <footer id="footer" class="mt-auto py-3 bg-light">

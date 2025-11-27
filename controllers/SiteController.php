@@ -61,7 +61,15 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
-        return $this->render('index');
+        // Fetch latest 8 movies from database
+        $movies = \app\models\Pelicula::find()
+            ->orderBy(['idpelicula' => SORT_DESC])
+            ->limit(8)
+            ->all();
+        
+        return $this->render('index', [
+            'movies' => $movies,
+        ]);
     }
 
     /**
